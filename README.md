@@ -20,6 +20,12 @@ It never touches:
 - shortcuts (anything with Cmd, Ctrl or Option);
 - a Return pressed into nothing: it's dropped, so a half-typed message is never sent by surprise.
 
+## Turn it off and on
+
+Press **Control + Option + F**, or click **Focus: ON** in the menu bar (top right of the screen). Focus Guard says
+"Focus Guard off." and the menu bar shows **Focus: OFF**; do it again to turn it back on ("Focus Guard on.").
+Handy while you type somewhere it doesn't recognise as a text box. It starts on again after a restart. (Mac.)
+
 ## Claude Code in the terminal or the extension
 
 Focus Guard looks each time:
@@ -38,9 +44,9 @@ The easiest way: the **Focus Guard** extension starts Focus Guard whenever VS Co
 itself.
 - **In VS Code:** Extensions view, search **Focus Guard**, Install. Or on the
   [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=aikellogg.focus-guard).
-- Or download `focus-guard-1.1.2.vsix` from [Releases](https://github.com/pfkellogg/focus-guard/releases/latest), then:
+- Or download `focus-guard-1.1.3.vsix` from [Releases](https://github.com/pfkellogg/focus-guard/releases/latest), then:
 - In VS Code: Extensions view > `...` menu > **Install from VSIX...**, and pick the file. Or in a terminal:
-  `code --install-extension focus-guard-1.1.2.vsix`
+  `code --install-extension focus-guard-1.1.3.vsix`
 - **Mac:** the first time it builds Focus Guard on your Mac (needs Apple's free Command Line Tools; it offers to install
   them), then asks for the Accessibility switch, out loud and with an **Open Settings** button.
 - **Windows:** nothing else to do. A small helper runs with Windows PowerShell, which every Windows 10 and 11 PC has.

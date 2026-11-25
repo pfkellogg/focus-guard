@@ -19,6 +19,12 @@ Made for people who can't always see where the keyboard focus is, and useful for
 It never touches typing into a real text box in any app, or shortcuts (Cmd, Ctrl, Option/Alt, Win). A Return pressed
 into nothing is dropped, so a half-typed message is never sent by surprise.
 
+## Turn it off and on
+
+Press **Control + Option + F**, or click **Focus: ON** in the menu bar (top right of the screen). Focus Guard says
+"Focus Guard off." and the menu bar shows **Focus: OFF**; do it again to turn it back on ("Focus Guard on.").
+Handy while you type somewhere it doesn't recognise as a text box. It starts on again after a restart. (Mac.)
+
 ## Claude Code in the terminal or the extension
 
 Setting **Focus Guard: Place**:

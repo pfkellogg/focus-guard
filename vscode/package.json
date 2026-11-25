@@ -2,7 +2,7 @@
   "name": "focus-guard",
   "displayName": "Focus Guard: Back to Claude Code",
   "description": "Typing into nothing? It tells you out loud and puts you back in Claude Code, keys and all. Click to stay where you are. macOS and Windows.",
-  "version": "1.1.2",
+  "version": "1.1.3",
   "publisher": "aikellogg",
   "license": "MIT",
   "author": { "name": "Patrick Kellogg", "url": "https://aikellogg.com" },
