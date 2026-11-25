@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.1.2
+- Click to stay: Focus Guard now stays quiet everywhere until you go back to VS Code yourself (no more prompts in the meantime).
+
 ## 1.1.1
 - Several VS Code windows open: Focus Guard brings back the one you last typed into, not just the one macOS used last.
 

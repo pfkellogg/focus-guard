@@ -9,8 +9,8 @@ When the keys you type would go nowhere, Focus Guard:
 
 1. **catches them**, so they don't land in the wrong place;
 2. **says out loud:** "Claude Code doesn't have focus. Click to stay here.";
-3. **waits 4 seconds.** Click any mouse button to stay where you are ("Staying here.", and it stays quiet in that app
-   for a minute);
+3. **waits 4 seconds.** Click any mouse button to stay where you are ("Staying here.", and it stays quiet until you go
+   back to VS Code yourself);
 4. if you don't click, it **brings VS Code to the front, puts the cursor in Claude Code**, and **types what you typed**
    there, so nothing has to be retyped.
 

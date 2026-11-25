@@ -61,9 +61,10 @@ func focusClaudeInside() {
 }
 let message = "Claude Code doesn't have focus. Click to stay here."
 let graceSeconds = 4.0                              // a click within this long: stay where you are
-var stayApps: Set<String> = []                      // the apps you chose to stay in, and until when
+// After a click to stay: quiet everywhere until you go back to VS Code yourself (clicking into it, its terminal or
+// Claude Code). Then it watches again.
+var resting = false
 var warnedApp: String? = nil
-var stayUntil = Date.distantPast
 let synth = NSSpeechSynthesizer()
 var lastSpoken = Date.distantPast
 var buffer: [String] = []                           // keys caught while moving focus
@@ -163,16 +164,12 @@ func warnThenMove() {
     }
 }
 
-func stayHere() {                                    // a click while warned: stay, and don't nag here for a minute
+func stayHere() {                                    // a click while warned: stay, quiet until you go back to VS Code
     pendingID += 1
     warning = false
     moving = false
     buffer.removeAll()
-    stayApps = Set([warnedApp, frontBundle()].compactMap { $0 })
-    DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {   // the window the click landed on, too
-        if let b = frontBundle() { stayApps.insert(b) }
-    }
-    stayUntil = Date().addingTimeInterval(60)
+    resting = true
     synth.stopSpeaking()
     synth.startSpeaking("Staying here.")
 }
@@ -221,7 +218,7 @@ let callback: CGEventTapCallBack = { _, type, event, _ in
         return Unmanaged.passUnretained(event)
     }
     if textFocused() { return Unmanaged.passUnretained(event) }
-    if let b = frontBundle(), stayApps.contains(b), Date() < stayUntil { return Unmanaged.passUnretained(event) }
+    if resting { return Unmanaged.passUnretained(event) }   // you chose to stay: quiet until you go back to VS Code
     // typing into nothing: catch it, say so, move to Claude Code
     if let s = NSEvent(cgEvent: event)?.characters, !s.isEmpty,
        let u = s.unicodeScalars.first, !CharacterSet.controlCharacters.contains(u) || s == "\r" {
@@ -249,6 +246,12 @@ if !AXIsProcessTrustedWithOptions(opts) {
         RunLoop.current.run(until: Date().addingTimeInterval(2))
     }
     synth.startSpeaking("Focus Guard is on.")
+}
+// You went back to VS Code yourself: watching again
+NSWorkspace.shared.notificationCenter.addObserver(forName: NSWorkspace.didActivateApplicationNotification, object: nil,
+                                                  queue: .main) { n in
+    let app = n.userInfo?[NSWorkspace.applicationUserInfoKey] as? NSRunningApplication
+    if app?.bundleIdentifier == targetBundle { resting = false }
 }
 let mask = CGEventMask(1 << CGEventType.keyDown.rawValue) | CGEventMask(1 << CGEventType.leftMouseDown.rawValue)
     | CGEventMask(1 << CGEventType.rightMouseDown.rawValue) | CGEventMask(1 << CGEventType.otherMouseDown.rawValue)
