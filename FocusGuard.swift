@@ -64,6 +64,9 @@ let graceSeconds = 4.0                              // a click within this long:
 // After a click to stay: quiet everywhere until you go back to VS Code yourself (clicking into it, its terminal or
 // Claude Code). Then it watches again.
 var resting = false
+// Off switch: Control+Option+F, or a click on "Focus: ON" in the menu bar. Says "Focus Guard off" / "on".
+var paused = false
+var statusItem: NSStatusItem?
 var warnedApp: String? = nil
 let synth = NSSpeechSynthesizer()
 var lastSpoken = Date.distantPast
@@ -206,6 +209,13 @@ let callback: CGEventTapCallBack = { _, type, event, _ in
     guard type == .keyDown else { return Unmanaged.passUnretained(event) }
     if event.getIntegerValueField(.eventSourceUserData) == 0x46474644 { return Unmanaged.passUnretained(event) }
     let flags = event.flags
+    // Control+Option+F (key 3), no Command/Shift: on/off
+    if event.getIntegerValueField(.keyboardEventKeycode) == 3, flags.contains(.maskControl), flags.contains(.maskAlternate),
+       !flags.contains(.maskCommand), !flags.contains(.maskShift) {
+        if event.getIntegerValueField(.keyboardEventAutorepeat) == 0 { DispatchQueue.main.async { togglePaused() } }
+        return nil
+    }
+    if paused { return Unmanaged.passUnretained(event) }
     if flags.contains(.maskCommand) || flags.contains(.maskControl) || flags.contains(.maskAlternate) {
         return Unmanaged.passUnretained(event)        // shortcuts: never
     }
@@ -228,6 +238,21 @@ let callback: CGEventTapCallBack = { _, type, event, _ in
     DispatchQueue.main.async { warnThenMove() }
     return nil
 }
+
+func showState() {
+    statusItem?.button?.title = paused ? "Focus: OFF" : "Focus: ON"
+    statusItem?.button?.toolTip = "Focus Guard: click (or Control+Option+F) to turn it " + (paused ? "on" : "off")
+}
+func togglePaused() {
+    paused.toggle()
+    pendingID += 1; warning = false; moving = false; buffer.removeAll(); resting = false
+    synth.stopSpeaking()
+    synth.startSpeaking(paused ? "Focus Guard off." : "Focus Guard on.")
+    writeStatus(paused ? "off" : "on")
+    showState()
+}
+final class MenuTarget: NSObject { @objc func clicked() { togglePaused() } }
+let menuTarget = MenuTarget()
 
 // status for the VS Code extension: ~/Library/Application Support/Focus Guard/status ("waiting-for-permission" / "on")
 let statusDir = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Focus Guard")
@@ -268,4 +293,8 @@ CFRunLoopAddSource(CFRunLoopGetCurrent(), src, .commonModes)
 CGEvent.tapEnable(tap: t, enable: true)
 print("Focus Guard is on: typing into nothing moves you to Claude Code.")
 NSApplication.shared.setActivationPolicy(.accessory)
+statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
+statusItem?.button?.target = menuTarget
+statusItem?.button?.action = #selector(MenuTarget.clicked)
+showState()
 NSApplication.shared.run()
