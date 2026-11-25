@@ -26,6 +26,8 @@ Setting **Focus Guard: Place**:
   extension's input.
 - **terminal** or **extension**: always that one.
 
+With several VS Code windows open, Focus Guard brings back the one you last typed into.
+
 The extension adds two shortcuts that Focus Guard presses for you; nobody presses them by hand:
 `ctrl+alt+shift+F19` (focus the terminal) and `ctrl+alt+shift+F18` (focus the Claude Code extension's input).
 

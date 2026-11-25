@@ -27,6 +27,8 @@ Focus Guard looks each time:
 - **Only the Claude Code extension:** the cursor goes to the extension's input.
 - **Both:** the terminal.
 
+With several VS Code windows open, it brings back the one you last typed into.
+
 To always use one: `defaults write com.aikellogg.focusguard place extension` (or `terminal`).
 Back to automatic: `defaults delete com.aikellogg.focusguard place`. Then restart Focus Guard.
 
@@ -36,9 +38,9 @@ The easiest way: the **Focus Guard** extension starts Focus Guard whenever VS Co
 itself.
 - **In VS Code:** Extensions view, search **Focus Guard**, Install. Or on the
   [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=aikellogg.focus-guard).
-- Or download `focus-guard-1.1.0.vsix` from [Releases](https://github.com/pfkellogg/focus-guard/releases/latest), then:
+- Or download `focus-guard-1.1.1.vsix` from [Releases](https://github.com/pfkellogg/focus-guard/releases/latest), then:
 - In VS Code: Extensions view > `...` menu > **Install from VSIX...**, and pick the file. Or in a terminal:
-  `code --install-extension focus-guard-1.1.0.vsix`
+  `code --install-extension focus-guard-1.1.1.vsix`
 - **Mac:** the first time it builds Focus Guard on your Mac (needs Apple's free Command Line Tools; it offers to install
   them), then asks for the Accessibility switch, out loud and with an **Open Settings** button.
 - **Windows:** nothing else to do. A small helper runs with Windows PowerShell, which every Windows 10 and 11 PC has.
