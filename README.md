@@ -34,7 +34,9 @@ Back to automatic: `defaults delete com.aikellogg.focusguard place`. Then restar
 
 The easiest way: the **Focus Guard** extension starts Focus Guard whenever VS Code starts, and adds the two shortcuts
 itself.
-- Download `focus-guard-1.1.0.vsix` from [Releases](https://github.com/pfkellogg/focus-guard/releases/latest).
+- **In VS Code:** Extensions view, search **Focus Guard**, Install. Or on the
+  [VS Code Marketplace](https://marketplace.visualstudio.com/items?itemName=aikellogg.focus-guard).
+- Or download `focus-guard-1.1.0.vsix` from [Releases](https://github.com/pfkellogg/focus-guard/releases/latest), then:
 - In VS Code: Extensions view > `...` menu > **Install from VSIX...**, and pick the file. Or in a terminal:
   `code --install-extension focus-guard-1.1.0.vsix`
 - **Mac:** the first time it builds Focus Guard on your Mac (needs Apple's free Command Line Tools; it offers to install
