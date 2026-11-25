@@ -30,7 +30,21 @@ Focus Guard looks each time:
 To always use one: `defaults write com.aikellogg.focusguard place extension` (or `terminal`).
 Back to automatic: `defaults delete com.aikellogg.focusguard place`. Then restart Focus Guard.
 
-## Install
+## VS Code extension (macOS and Windows)
+
+The easiest way: the **Focus Guard** extension starts Focus Guard whenever VS Code starts, and adds the two shortcuts
+itself.
+- Download `focus-guard-1.1.0.vsix` from [Releases](https://github.com/pfkellogg/focus-guard/releases/latest).
+- In VS Code: Extensions view > `...` menu > **Install from VSIX...**, and pick the file. Or in a terminal:
+  `code --install-extension focus-guard-1.1.0.vsix`
+- **Mac:** the first time it builds Focus Guard on your Mac (needs Apple's free Command Line Tools; it offers to install
+  them), then asks for the Accessibility switch, out loud and with an **Open Settings** button.
+- **Windows:** nothing else to do. A small helper runs with Windows PowerShell, which every Windows 10 and 11 PC has.
+  It is new: it builds and starts on Windows (checked on every change by GitHub Actions), but please report anything
+  odd in Issues.
+- Settings: **Focus Guard: Place** (auto / terminal / extension) and **Focus Guard: Enabled**.
+
+## Install without the extension (Mac)
 
 You need macOS 13 or later and VS Code. Paste this into Terminal:
 
@@ -63,7 +77,9 @@ curl -fsSL https://raw.githubusercontent.com/pfkellogg/focus-guard/main/uninstal
 
 ## How it works
 
-One Swift file, [`FocusGuard.swift`](FocusGuard.swift):
+Mac: one Swift file, [`FocusGuard.swift`](FocusGuard.swift). Windows: [`windows/FocusGuard.cs`](windows/FocusGuard.cs),
+compiled at start by [`windows/FocusGuard.ps1`](windows/FocusGuard.ps1). The extension: [`vscode/`](vscode).
+On the Mac:
 - A keyboard event tap sees each key. If VS Code isn't in front and no text element has focus (checked through the
   Accessibility API), the key is held back.
 - `NSSpeechSynthesizer` speaks; a mouse click within 4 seconds cancels the move.
