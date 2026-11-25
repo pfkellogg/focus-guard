@@ -72,6 +72,40 @@ var tap: CFMachPort?
 
 func frontBundle() -> String? { NSWorkspace.shared.frontmostApplication?.bundleIdentifier }
 
+// With several VS Code windows: the one you last typed into is where Claude Code is brought back (not just the one
+// macOS used last). Its title, read when a key goes to VS Code.
+var lastWindowTitle: String?
+
+func vscodeApp() -> AXUIElement? {
+    guard let app = NSRunningApplication.runningApplications(withBundleIdentifier: targetBundle).first else { return nil }
+    return AXUIElementCreateApplication(app.processIdentifier)
+}
+
+func focusedWindowTitle() -> String? {
+    guard let app = vscodeApp() else { return nil }
+    var w: AnyObject?
+    guard AXUIElementCopyAttributeValue(app, kAXFocusedWindowAttribute as CFString, &w) == .success, let win = w else { return nil }
+    var title: AnyObject?
+    AXUIElementCopyAttributeValue(win as! AXUIElement, kAXTitleAttribute as CFString, &title)
+    return title as? String
+}
+
+func raiseWindow(titled title: String) {
+    guard let app = vscodeApp() else { return }
+    var ws: AnyObject?
+    guard AXUIElementCopyAttributeValue(app, kAXWindowsAttribute as CFString, &ws) == .success,
+          let wins = ws as? [AXUIElement] else { return }
+    for w in wins {
+        var t: AnyObject?
+        AXUIElementCopyAttributeValue(w, kAXTitleAttribute as CFString, &t)
+        if (t as? String) == title {
+            AXUIElementSetAttributeValue(w, kAXMainAttribute as CFString, kCFBooleanTrue)
+            AXUIElementPerformAction(w, kAXRaiseAction as CFString)
+            return
+        }
+    }
+}
+
 // Is a text-entry element focused in the front app? (a field, a text area, an editable web field, a terminal)
 func textFocused() -> Bool {
     let sys = AXUIElementCreateSystemWide()
@@ -146,6 +180,7 @@ func stayHere() {                                    // a click while warned: st
 func moveFocus() {
     if let app = NSRunningApplication.runningApplications(withBundleIdentifier: targetBundle).first {
         app.activate()
+        if let t = lastWindowTitle { raiseWindow(titled: t) }   // the window you were typing in
     } else {
         if let url = NSWorkspace.shared.urlForApplication(withBundleIdentifier: targetBundle) {
             NSWorkspace.shared.openApplication(at: url, configuration: NSWorkspace.OpenConfiguration())
@@ -181,7 +216,11 @@ let callback: CGEventTapCallBack = { _, type, event, _ in
         if let s = NSEvent(cgEvent: event)?.characters { buffer.append(s) }
         return nil
     }
-    if frontBundle() == targetBundle || textFocused() { return Unmanaged.passUnretained(event) }
+    if frontBundle() == targetBundle {
+        DispatchQueue.main.async { if let t = focusedWindowTitle() { lastWindowTitle = t } }
+        return Unmanaged.passUnretained(event)
+    }
+    if textFocused() { return Unmanaged.passUnretained(event) }
     if let b = frontBundle(), stayApps.contains(b), Date() < stayUntil { return Unmanaged.passUnretained(event) }
     // typing into nothing: catch it, say so, move to Claude Code
     if let s = NSEvent(cgEvent: event)?.characters, !s.isEmpty,
