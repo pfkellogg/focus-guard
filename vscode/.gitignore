@@ -1,0 +1,4 @@
+mac/
+win/
+*.vsix
+node_modules/

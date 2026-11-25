@@ -1,0 +1,19 @@
+name: Windows helper
+on: [push, pull_request, workflow_dispatch]
+jobs:
+  build-and-start:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Compile and self-test (Windows PowerShell 5.1)
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File windows\FocusGuard.ps1 -SelfTest
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+      - name: Start it for 15 seconds (hooks installed, no crash)
+        shell: powershell
+        run: |
+          $p = Start-Process powershell -ArgumentList '-NoProfile','-ExecutionPolicy','Bypass','-File','windows\FocusGuard.ps1' -PassThru -RedirectStandardOutput out.txt -RedirectStandardError err.txt
+          Start-Sleep 15
+          Get-Content out.txt, err.txt
+          if ($p.HasExited) { Write-Host "exited: $($p.ExitCode)"; exit 1 } else { Write-Host "still running: OK"; Stop-Process $p.Id }

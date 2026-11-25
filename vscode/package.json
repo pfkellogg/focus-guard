@@ -1,0 +1,44 @@
+{
+  "name": "focus-guard",
+  "displayName": "Focus Guard: Back to Claude Code",
+  "description": "Typing into nothing? It tells you out loud and puts you back in Claude Code, keys and all. Click to stay where you are. macOS and Windows.",
+  "version": "1.1.0",
+  "publisher": "aikellogg",
+  "license": "MIT",
+  "author": { "name": "Patrick Kellogg", "url": "https://aikellogg.com" },
+  "repository": { "type": "git", "url": "https://github.com/pfkellogg/focus-guard" },
+  "homepage": "https://github.com/pfkellogg/focus-guard#readme",
+  "bugs": { "url": "https://github.com/pfkellogg/focus-guard/issues" },
+  "icon": "icon.png",
+  "engines": { "vscode": "^1.80.0" },
+  "categories": ["Other"],
+  "keywords": ["claude code", "accessibility", "focus", "screen reader", "low vision", "keyboard"],
+  "activationEvents": ["onStartupFinished"],
+  "main": "./extension.js",
+  "contributes": {
+    "commands": [
+      { "command": "focusGuard.start", "title": "Focus Guard: Start" },
+      { "command": "focusGuard.stop", "title": "Focus Guard: Stop" },
+      { "command": "focusGuard.openAccessibility", "title": "Focus Guard: Open the Accessibility Settings (Mac)" }
+    ],
+    "configuration": {
+      "title": "Focus Guard",
+      "properties": {
+        "focusGuard.enabled": { "type": "boolean", "default": true, "description": "Start Focus Guard when VS Code starts." },
+        "focusGuard.place": {
+          "type": "string", "enum": ["auto", "terminal", "extension"], "default": "auto",
+          "enumDescriptions": [
+            "Look each time: Claude Code in a VS Code terminal wins; else the Claude Code extension.",
+            "Always the terminal (Claude Code run in VS Code's terminal).",
+            "Always the Claude Code extension's input."
+          ],
+          "description": "Where in VS Code to put the cursor."
+        }
+      }
+    },
+    "keybindings": [
+      { "key": "ctrl+alt+shift+f19", "command": "workbench.action.terminal.focus" },
+      { "key": "ctrl+alt+shift+f18", "command": "claude-vscode.focus" }
+    ]
+  }
+}

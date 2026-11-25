@@ -193,18 +193,34 @@ let callback: CGEventTapCallBack = { _, type, event, _ in
     return nil
 }
 
+// status for the VS Code extension: ~/Library/Application Support/Focus Guard/status ("waiting-for-permission" / "on")
+let statusDir = FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("Library/Application Support/Focus Guard")
+func writeStatus(_ s: String) {
+    try? FileManager.default.createDirectory(at: statusDir, withIntermediateDirectories: true)
+    try? s.write(to: statusDir.appendingPathComponent("status"), atomically: true, encoding: .utf8)
+}
+
+// no permission yet: ask once (out loud too), then wait for the switch instead of quitting
 let opts = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true] as CFDictionary
 if !AXIsProcessTrustedWithOptions(opts) {
+    writeStatus("waiting-for-permission")
     print("Focus Guard needs Accessibility permission: System Settings > Privacy & Security > Accessibility")
+    synth.startSpeaking("Focus Guard needs one switch turned on, in Privacy and Security, Accessibility.")
+    while !AXIsProcessTrusted() {
+        RunLoop.current.run(until: Date().addingTimeInterval(2))
+    }
+    synth.startSpeaking("Focus Guard is on.")
 }
 let mask = CGEventMask(1 << CGEventType.keyDown.rawValue) | CGEventMask(1 << CGEventType.leftMouseDown.rawValue)
     | CGEventMask(1 << CGEventType.rightMouseDown.rawValue) | CGEventMask(1 << CGEventType.otherMouseDown.rawValue)
 tap = CGEvent.tapCreate(tap: .cgSessionEventTap, place: .headInsertEventTap, options: .defaultTap,
                         eventsOfInterest: mask, callback: callback, userInfo: nil)
 guard let t = tap else {
-    print("Focus Guard: couldn't watch the keyboard yet (permission). It retries when relaunched.")
+    writeStatus("waiting-for-permission")
+    print("Focus Guard: couldn't watch the keyboard (permission). Turn the switch off and on, then start it again.")
     exit(1)
 }
+writeStatus("on")
 let src = CFMachPortCreateRunLoopSource(kCFAllocatorDefault, t, 0)
 CFRunLoopAddSource(CFRunLoopGetCurrent(), src, .commonModes)
 CGEvent.tapEnable(tap: t, enable: true)
